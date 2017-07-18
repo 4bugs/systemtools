@@ -6,20 +6,24 @@ import shutil
 import sys
 import logging
 
+# Change list
+# 2017-07-18 09:45:53
+#
+
 # set the id of the server
 HOST_ID = 2 
 
 # set the query dir
-QUERY_DIR = '~/backup'
+QUERY_DIR = '/Users/wangqi/backup'
 
 # set the percent of the QUERY_DIR deadline
 PER = 79
 
 # set the log path
-LOG_PATH = '~/tmp/archive.log'
+LOG_PATH = '/Users/wangqi/tmp/archive.log'
 
 # set the base backup dir
-BACKUP_BASE = '~/backup/core%s/' % HOST_ID
+BACKUP_BASE = '/Users/wangqi/backup/core%s/' % HOST_ID
 
 
 
@@ -73,20 +77,19 @@ def archve_trc():
         arc_day_dir = ''
     # archive the day need to be archived and remove the day dir
     if os.path.exists(arc_day_dir):
-        print arc_day_dir
         logging.info('---archiving the %s ...---' % arc_day_dir)
-        os.system('cd %s && tar -czf %s.tar.gz %s' %
-                  (arc_mon_dir, min(DAY_DIR), min(DAY_DIR)))
+        os.system('cd %s && tar -czf %s.tar.gz %s 2>&1 | tee %s' %
+                  (arc_mon_dir, min(DAY_DIR), min(DAY_DIR), LOG_PATH))
         logging.info('%s has been archived.' % arc_day_dir)
         logging.info('%s will be removed' % arc_day_dir)
         shutil.rmtree(arc_day_dir)
         logging.info('%s has been removed' % arc_day_dir)
         DAY_DIR.pop(DAY_DIR.index(min(DAY_DIR)))
+    # if there is no more days dir, then archive the month dir
     else:
         logging.info('---archiving the %s---' % arc_mon_dir)
-        # shutil.make_archive(arc_mon_dir, 'gztar', arc_mon_dir)
-        os.system('cd %s && tar -czf %s.tar.gz %s' %
-                  (BACKUP_BASE, min(MONTH_DIR), min(MONTH_DIR)))
+        os.system('cd %s && tar -czf %s.tar.gz %s 2>&1 | tee %s' %
+                  (BACKUP_BASE, min(MONTH_DIR), min(MONTH_DIR), LOG_PATH))
         logging.info('%s has been archied' % arc_mon_dir)
         logging.info('%s will be removed' % arc_mon_dir)
         shutil.rmtree(arc_mon_dir)
@@ -97,6 +100,8 @@ def archve_trc():
 def need_to_be_archived():
     now_per = disk_backup()
     logging.info('Now %s is %s%%' % (QUERY_DIR ,now_per))
+    # to kill the last python backup_core thread
+    #os.system('sh /app/ussver/daily.sh')
     while now_per > PER:
         archve_trc()
         now_per = disk_backup()
