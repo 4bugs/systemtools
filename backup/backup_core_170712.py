@@ -10,16 +10,16 @@ import logging
 HOST_ID = 2 
 
 # set the query dir
-QUERY_DIR = '/Users/wangqi/backup'
+QUERY_DIR = '/backup'
 
 # set the percent of the QUERY_DIR deadline
 PER = 79
 
 # set the log path
-LOG_PATH = '/Users/wangqi/tmp/archive.log'
+LOG_PATH = '/tmp/archive.log'
 
 # set the base backup dir
-BACKUP_BASE = '/Users/wangqi/backup/core%s/' % HOST_ID
+BACKUP_BASE = '/backup/core%s/' % HOST_ID
 
 
 
@@ -30,7 +30,7 @@ def log_thread():
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s %(filename)s %'
                                '(levelname)s %(message)s',
-                        datefmt='%Y,%m %d %H:%M:%S',
+                        datefmt='%a,%b %Y %H:%M:%S',
                         filename='%s' % LOG_PATH,
                         filemode='a'
                         )
@@ -75,7 +75,6 @@ def archve_trc():
     if os.path.exists(arc_day_dir):
         print arc_day_dir
         logging.info('---archiving the %s ...---' % arc_day_dir)
-
         os.system('cd %s && tar -czf %s.tar.gz %s' %
                   (arc_mon_dir, min(DAY_DIR), min(DAY_DIR)))
         logging.info('%s has been archived.' % arc_day_dir)
